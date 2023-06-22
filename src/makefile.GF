@@ -32,8 +32,10 @@ LIBFLAGS  =  -llapack -lblas
 PRINT1 = a2ps -g -o-
 PRINT2 = > mcXdCOE.ps # | fleet -odouble
 
+all:   WFplot.GF WFplotPSI.GF
+
 WFplotPSI.GF:    mainPSI.o util.o 
-	$(F90) $(F90FLAGS) -o WFplot.GF \
+	$(F90) $(F90FLAGS) -o WFplotPSI.GF \
 		util.o mainPSI.o $(LIBFLAGS)
 
 mainPSI.o:	mainPSI.f90

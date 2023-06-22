@@ -1,9 +1,17 @@
 !------------------------------------------------------------------------------
-! $Header: /opt/cvs/phsht/WFplot/main.f90,v 1.4 2008/07/07 13:07:22 phsht Exp $
+! $Header: /home/cvs/phsht/WFplot/main.f90,v 1.6 2019/09/18 10:14:16 phsht Exp $
 !------------------------------------------------------------------------------
 
 !------------------------------------------------------------------------------
 ! $Log: main.f90,v $
+! Revision 1.6  2019/09/18 10:14:16  phsht
+! removed some of the PRINT messages
+!
+! Revision 1.5  2019/09/18 09:56:03  phsht
+! added maqkefile.GF to work with standard gfortran;
+! added FRAME input;
+! switched COLOR to 1 and B/W to 0
+!
 ! Revision 1.4  2008/07/07 13:07:22  phsht
 ! automatic ALLOCATion of menory based on file size;
 ! added color and BW option
@@ -25,13 +33,13 @@ PROGRAM WFplot
   REAL BWI,RI,CR,CG,CB, dummy
   INTEGER CUBESIZE,N,I,J,K,L,NR,SMALL,EDGED,LARGE, IErr, NMAX
   CHARACTER*200 FILE,PS_FILE
-  INTEGER PS_UNIT, CHOICE
-  LOGICAL SET_COL
-  PARAMETER(PS_UNIT=21,NMAX=1000000000)
+  INTEGER PS_UNIT, CHOICE, FRAME
+  LOGICAL SET_COL, LOG
+  PARAMETER(PS_UNIT=21,NMAX=1000000000,LOG=.FALSE.)
   COMMON /COMM_CENTPROJ/ Z1,Z2,Z3,U1,U2,U3,X1,X2,X3,Y1,Y2,Y3,PS_SCALE
 
   !----------------------------------------------------------------------------
-  PRINT*,"WFplot $Revision: 1.4 $"
+  PRINT*,"WFplot $Revision: 1.6 $"
   !----------------------------------------------------------------------------
 
   WRITE(*,*) "FILENAME OF WAVEFUNCTION="
@@ -43,7 +51,8 @@ PROGRAM WFplot
   I=I+1
   GOTO 80
 90 CLOSE(12)
-  PRINT*,"WFplot: found", I, " wave function amplitues."
+
+  IF(LOG) PRINT*,"WFplot: found", I, " wave function amplitues."
   CUBESIZE= INT(I ** (1.0/3.0))+1
   WRITE(*,*) "LINEAR CUBE SIZE=", CUBESIZE
 
@@ -64,8 +73,11 @@ PROGRAM WFplot
      PRINT*,"main: memory for ", CUBESIZE, "^3 wavefunction values allocated."
   ENDIF
 
-  PRINT*, "Choose: COLOR [0], B/W [1]"
+  PRINT*, "Choose: B/W [0], COLOR [1]"
   READ(*,*) CHOICE
+
+  PRINT*, "Choose: NO FRAME [0], FRAME [1]"
+  READ(*,*) FRAME
 
   !----------------------------------------------------------------------------
 
@@ -99,7 +111,10 @@ PROGRAM WFplot
   
   BCENTER=(1.d0+LX)/2.D0
   BSIZE=LX/2.D0+0.5
-  CALL BOX_1(BCENTER,BSIZE,PS_UNIT,PS_FILE)
+
+  !CALL BOX_0(BCENTER,BSIZE,PS_UNIT,PS_FILE)
+  
+  IF(FRAME==1) CALL BOX_1(BCENTER,BSIZE,PS_UNIT,PS_FILE)
   
   CALL PS_D_LINE(PS_UNIT,10)
   
@@ -111,23 +126,23 @@ PROGRAM WFplot
   EDGED=0
   LARGE=0
   DO J=CUBESIZE,1,-1
-     PRINT *,'--- working on plane',J
+     IF(LOG) PRINT *,'--- working on plane',J
 
      ! setting the color
 
      RI=1.-REAL(J-0.999)/REAL(CUBESIZE)
      SELECT CASE(CHOICE)
-     CASE(0)
-        CALL RGB_SET(RI,CR,CG,CB)
      CASE(1)
+        CALL RGB_SET(RI,CR,CG,CB)
+     CASE(0)
         BWI= 1+3.0*RI*(RI-1.0)
         CR= BWI; CG= BWI; CB= BWI
-        PRINT*,"DBG: J,BWI", J,BWI
+        !PRINT*,"DBG: J,BWI", J,BWI
      END SELECT
      CALL PS_COLOR(PS_UNIT,CR,CG,CB)
 
      !CALL DRAW_CUBE(CUBESIZE,J,0,0.5D0,.FALSE.,PS_UNIT,PS_FILE)
-     CALL DRAW_CUBE(CUBESIZE,J,0,0.5D0,.FALSE.,PS_UNIT)
+     IF(FRAME==1) CALL DRAW_CUBE(CUBESIZE,J,0,0.5D0,.FALSE.,PS_UNIT)
      SET_COL=.FALSE.
      DO I=1,CUBESIZE
         DO K=1,CUBESIZE
@@ -157,7 +172,8 @@ PROGRAM WFplot
      ENDDO
   ENDDO
   
-  CALL BOX_2(BCENTER,BSIZE,PS_UNIT,PS_FILE)
+  IF(FRAME.EQ.1) CALL BOX_2(BCENTER,BSIZE,PS_UNIT,PS_FILE)
+  
   WRITE(*,19) N,SMALL,EDGED,LARGE
 19 FORMAT(I7,' SITES:',/, I7,' SMALL',I7,' EDGED AND ',I7,' LARGE CUBES')
   
