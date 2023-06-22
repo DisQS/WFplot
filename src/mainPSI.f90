@@ -39,7 +39,7 @@ PROGRAM WFplot
   COMMON /COMM_CENTPROJ/ Z1,Z2,Z3,U1,U2,U3,X1,X2,X3,Y1,Y2,Y3,PS_SCALE
 
   !----------------------------------------------------------------------------
-  PRINT*,"WFplot $Revision: 1.6 $"
+  PRINT*,"WFplotPSI $Revision: 1.6 $"
   !----------------------------------------------------------------------------
 
   WRITE(*,*) "FILENAME OF WAVEFUNCTION="
@@ -112,7 +112,7 @@ PROGRAM WFplot
   BCENTER=(1.d0+LX)/2.D0
   BSIZE=LX/2.D0+0.5
 
-  !CALL BOX_0(BCENTER,BSIZE,PS_UNIT,PS_FILE)
+  CALL BOX_0(BCENTER,BSIZE,PS_UNIT,PS_FILE)
   
   IF(FRAME==1) CALL BOX_1(BCENTER,BSIZE,PS_UNIT,PS_FILE)
   

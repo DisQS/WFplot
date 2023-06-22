@@ -132,7 +132,7 @@ SUBROUTINE BOX_1(C,SIZE,PS_UNIT,PS_FILE)
      BBH(1)=MAX(IP(I,1),BBH(1))
      BBH(2)=MAX(IP(I,2),BBH(2))
   ENDDO
-  CALL ps_open(PS_UNIT,PS_FILE,bbL,bbH)
+!!$  CALL ps_open(PS_UNIT,PS_FILE,bbL,bbH)
   call ps_color(PS_UNIT,0.,0.,0.)
   CALL PS_D_LINE(PS_UNIT,8)
   call ps_line(PS_UNIT,IP(3,1),IP(3,2),IP(2,1),IP(2,2))
@@ -201,7 +201,7 @@ SUBROUTINE SET_Z(Z1,Z2,Z3,LX)
   Z1=RX*LX
   Z2=RY*LX
   Z3=RZ*LX
-  PRINT *,'Z ',Z1,Z2,Z3
+  !PRINT *,'Z ',Z1,Z2,Z3
 END SUBROUTINE SET_Z
 
 SUBROUTINE SET_PLANE(Z1,Z2,Z3,U1,U2,U3,X1,X2,X3,Y1,Y2,Y3)
@@ -230,9 +230,9 @@ SUBROUTINE SET_PLANE(Z1,Z2,Z3,U1,U2,U3,X1,X2,X3,Y1,Y2,Y3)
   Y1=Y1/NORM
   Y2=Y2/NORM
   Y3=Y3/NORM
-  PRINT *,'X ',X1,X2,X3
-  PRINT *,'Y ',Y1,Y2,Y3
-  PRINT *,'U ',U1,U2,U3
+  !PRINT *,'X ',X1,X2,X3
+  !PRINT *,'Y ',Y1,Y2,Y3
+  !PRINT *,'U ',U1,U2,U3
 END SUBROUTINE SET_PLANE
 
 !------------ open the PS file-----------
@@ -255,7 +255,7 @@ subroutine ps_open(iunit,file,bbl,bbh)
   BYL=BYL-BY
   BYH=BYH+BY
   
-  print *,'psopen()',file,IUNIT
+  !print *,'psopen() ',file,IUNIT
   len=index(file,' ')
   psfile=file(1:len-1)//'.eps'
   open(iunit,file=psfile(1:len+4),err=999)
