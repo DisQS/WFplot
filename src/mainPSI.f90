@@ -118,7 +118,7 @@ PROGRAM WFplot
   
   CALL PS_D_LINE(PS_UNIT,10)
   
-  FACTOR=1000.
+  FACTOR=(1000.)/2.0
   scale=11.4
   NR=0
   D13=1.D0/3.D0
@@ -152,13 +152,16 @@ PROGRAM WFplot
            NR=NR+1
            IF (WF(NR).GE.0.0) THEN
               POSITIVE=.True.
+              CALL PS_COLOR(PS_UNIT,CR,CG,CB)
+           ELSE
+              POSITIVE=.False.
               CALL PS_COLOR(PS_UNIT,CRneg,CGneg,CBneg)
            END IF
 
            IF (ABS(WF(NR)).GT.1 .and. SET_COL) &
                 call ps_color(PS_UNIT,cR,cG,cB)
            
-           IF (ABS(WF(NR)).GT. FACTOR) THEN
+           IF (ABS(WF(NR)).GT. FACTOR/2.) THEN
               LARGE=LARGE+1
               SIZE=ABS(WF(NR))**D13/scale
               !CALL DRAW_CUBE(I,J,K,SIZE,.TRUE.,PS_UNIT)

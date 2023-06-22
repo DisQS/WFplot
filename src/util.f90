@@ -99,7 +99,7 @@ SUBROUTINE DRAW_CUBE_POSITIVE(IX,IY,IZ,SIZE,EDGED,POSITIVE,PS_UNIT)
   IF (POSITIVE) THEN
      call ps_color(PS_UNIT,0.,0.,0.) ! BLACK if positive
   ELSE
-     call ps_color(PS_UNIT,0.8,0.8,0.8) ! WHITE if negative
+     call ps_color(PS_UNIT,0.9,0.9,0.9) ! WHITE if negative
   ENDIF
   CALL ps_poly(PS_UNIT,IP(1,1),IP(1,2),7,.FALSE.)
   
