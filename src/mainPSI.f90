@@ -30,11 +30,11 @@ PROGRAM WFplot
   DOUBLE PRECISION O1,O2,O3,X,Y
   DOUBLE PRECISION Z1,Z2,Z3,U1,U2,U3,X1,X2,X3,Y1,Y2,Y3
   DOUBLE PRECISION LX,BSIZE,BCENTER,PS_SCALE,SCALE
-  REAL BWI,RI,CR,CG,CB, dummy
+  REAL BWI,RI,CR,CG,CB,CRneg,CGneg,CBneg, dummy
   INTEGER CUBESIZE,N,I,J,K,L,NR,SMALL,EDGED,LARGE, IErr, NMAX
   CHARACTER*200 FILE,PS_FILE
   INTEGER PS_UNIT, CHOICE, FRAME
-  LOGICAL SET_COL, LOG
+  LOGICAL SET_COL, LOG, POSITIVE
   PARAMETER(PS_UNIT=21,NMAX=1000000000,LOG=.FALSE.)
   COMMON /COMM_CENTPROJ/ Z1,Z2,Z3,U1,U2,U3,X1,X2,X3,Y1,Y2,Y3,PS_SCALE
 
@@ -87,8 +87,8 @@ PROGRAM WFplot
   DO I=1,N
      READ(12,*,END=1001,ERR=1002) WF(I)
      ! print *,i,wf(i)
+     NORM=NORM+ABS(WF(I))
      WF(I)=(WF(I))
-     NORM=NORM+WF(I)**2
   ENDDO
   
   CLOSE(12)
@@ -131,6 +131,7 @@ PROGRAM WFplot
      ! setting the color
 
      RI=1.-REAL(J-0.999)/REAL(CUBESIZE)
+     CRneg=1.-CR; CGneg=1.-CG; CBneg=1.-Cb; 
      SELECT CASE(CHOICE)
      CASE(1)
         CALL RGB_SET(RI,CR,CG,CB)
@@ -139,6 +140,7 @@ PROGRAM WFplot
         CR= BWI; CG= BWI; CB= BWI
         !PRINT*,"DBG: J,BWI", J,BWI
      END SELECT
+     !PRINT*,RI,BWI,CR,CRneg,CG,CGneg,CR,CRneg
      CALL PS_COLOR(PS_UNIT,CR,CG,CB)
 
      !CALL DRAW_CUBE(CUBESIZE,J,0,0.5D0,.FALSE.,PS_UNIT,PS_FILE)
@@ -148,23 +150,31 @@ PROGRAM WFplot
         DO K=1,CUBESIZE
            
            NR=NR+1
-           IF (WF(NR).GT.1 .and. SET_COL) &
+           IF (WF(NR).GE.0.0) THEN
+              POSITIVE=.True.
+              CALL PS_COLOR(PS_UNIT,CRneg,CGneg,CBneg)
+           END IF
+
+           IF (ABS(WF(NR)).GT.1 .and. SET_COL) &
                 call ps_color(PS_UNIT,cR,cG,cB)
            
-           IF (WF(NR).GT. FACTOR) THEN
+           IF (ABS(WF(NR)).GT. FACTOR) THEN
               LARGE=LARGE+1
-              SIZE=WF(NR)**D13/scale
-              CALL DRAW_CUBE(I,J,K,SIZE,.TRUE.,PS_UNIT)
+              SIZE=ABS(WF(NR))**D13/scale
+              !CALL DRAW_CUBE(I,J,K,SIZE,.TRUE.,PS_UNIT)
+              CALL DRAW_CUBE_POSITIVE(I,J,K,SIZE,.TRUE.,POSITIVE,PS_UNIT)
               SET_COL=.TRUE.
-           ELSE IF (WF(NR).GT. DSQRT(FACTOR)) THEN
+           ELSE IF (ABS(WF(NR)).GT. DSQRT(FACTOR)) THEN
               EDGED=EDGED+1
-              SIZE=WF(NR)**D13/scale
-              CALL DRAW_CUBE(I,J,K,SIZE,.TRUE.,PS_UNIT)
+              SIZE=ABS(WF(NR))**D13/scale
+              !CALL DRAW_CUBE(I,J,K,SIZE,.TRUE.,PS_UNIT)
+              CALL DRAW_CUBE_POSITIVE(I,J,K,SIZE,.TRUE.,POSITIVE,PS_UNIT)
               SET_COL=.TRUE.
-           ELSE IF (WF(NR).GT. 1            ) THEN ! >MEAN
+           ELSE IF (ABS(WF(NR)).GT. 2.0          ) THEN ! >MEAN
               SMALL=SMALL+1
-              SIZE=WF(NR)**D13/scale
-              CALL DRAW_CUBE(I,J,K,SIZE,.FALSE.,PS_UNIT)
+              SIZE=ABS(WF(NR))**D13/scale
+              !CALL DRAW_CUBE(I,J,K,SIZE,.FALSE.,PS_UNIT)
+              CALL DRAW_CUBE_POSITIVE(I,J,K,SIZE,.FALSE.,POSITIVE,PS_UNIT)
               SET_COL=.FALSE.
            ENDIF
            
